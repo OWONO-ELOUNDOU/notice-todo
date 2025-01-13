@@ -1,16 +1,23 @@
 import React from 'react';
+import { Link, router } from "expo-router";
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {Link} from "expo-router";
-import {tasks} from "@/assets/tasks";
+
+// Font Awesome Icons
+import { FontAwesome } from '@expo/vector-icons';
+
+// Firebase function
+import { getAuth } from '@firebase/auth';
 
 const Home = () => {
+    getAuth().onAuthStateChanged((user) => {
+        if (!user) router.replace("/auth/login");
+    });
+    
     return (
         <ScrollView alwaysBounceVertical={true} style={styles.container}>
             <View style={styles.header}>
                 <Link style={styles.add} href="/form">
-                    <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z"></path>
-                    </svg>
+                    <FontAwesome size={20} name='plus' />
                     Add
                 </Link>
             </View>
@@ -125,9 +132,11 @@ const styles = StyleSheet.create({
         backgroundColor: "#FFFFFF"
     },
     header: {
+        display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
         flexDirection: 'row',
+        gap: 10,
         marginBottom: 20
     },
     add: {

@@ -1,6 +1,11 @@
 import React from 'react';
-import {View, StyleSheet, Text, Image, Button} from "react-native";
-import {Link, Stack, useGlobalSearchParams} from 'expo-router';
+import {View, StyleSheet, Text, Image} from "react-native";
+import { Link, Stack, useGlobalSearchParams } from 'expo-router';
+
+// Font Awesome icons
+import { FontAwesome } from '@expo/vector-icons';
+
+// Import Constants
 import {tasks} from "@/assets/tasks";
 import { images } from "@/assets/images";
 
@@ -28,8 +33,14 @@ const Details = () => {
                 </Text>
 
                 <View style={styles.buttons}>
-                    <Link style={styles.delete} href="/home">Delete</Link>
-                    <Link style={styles.done} href="/home">Done</Link>
+                    <Link style={styles.delete} href="/home">
+                        <FontAwesome size={20} name='trash'/>
+                        Delete
+                    </Link>
+                    <Link style={styles.done} href="/home">
+                        <FontAwesome size={20} name='check'/>
+                        Done
+                    </Link>
                 </View>
             </View>
 
@@ -108,6 +119,11 @@ const styles = StyleSheet.create({
     },
     delete: {
         width: '48%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10,
         borderRadius: 30,
         padding: 15,
         fontSize: 15,
@@ -118,6 +134,11 @@ const styles = StyleSheet.create({
     },
     done: {
         width: '48%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10,
         borderRadius: 30,
         padding: 15,
         fontSize: 15,

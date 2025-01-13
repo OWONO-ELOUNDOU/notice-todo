@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { auth } from '@/config/firebaseConfig';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { FontAwesome } from '@expo/vector-icons';
 
 const Profile = () => {
     return(
@@ -18,6 +20,17 @@ const Profile = () => {
             <View style={styles.field}>
                 <Text style={styles.label}>Email Address</Text>
                 <Text style={styles.text}>JohnDoe@outlook.com</Text>
+            </View>
+
+            {/* Sign Out */}
+            <View style={styles.signout}>
+                <Text style={styles.signout_text}>Sign Out</Text>
+                <TouchableOpacity onPress={() => auth.signOut()}>
+                    <Text style={styles.signout_button}>
+                        <FontAwesome size={20} name='sign-out' />
+                        Sign Out
+                    </Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -66,5 +79,30 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         fontFamily: 'Poppins'
+    },
+    signout: {
+        width: '100%',
+        marginTop: 30
+    },
+    signout_text: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        fontFamily: 'Poppins',
+        textAlign: 'center',
+        marginBottom: 30,
+    },
+    signout_button: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 10,
+        paddingVertical: 20,
+        borderRadius: 30,
+        fontSize: 15,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#FFFFFF',
+        backgroundColor: '#000000'
     }
 })
