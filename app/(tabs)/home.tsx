@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, router } from "expo-router";
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
 
@@ -12,7 +12,9 @@ const Home = () => {
     getAuth().onAuthStateChanged((user) => {
         if (!user) router.replace("/auth/login");
     });
-    
+
+    const [task, setTask] = useState<any>([]);
+
     return (
         <ScrollView alwaysBounceVertical={true} style={styles.container}>
             <View style={styles.header}>
