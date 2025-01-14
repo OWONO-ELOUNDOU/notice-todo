@@ -1,19 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, router } from "expo-router";
-import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, FlatList} from 'react-native';
 
 // Font Awesome Icons
 import { FontAwesome } from '@expo/vector-icons';
 
 // Firebase function
 import { getAuth } from '@firebase/auth';
+import { firestoreDB } from '@/config/firebaseConfig';
+import { collection, getDocs, doc, query, where } from 'firebase/firestore';
 
 const Home = () => {
     getAuth().onAuthStateChanged((user) => {
         if (!user) router.replace("/auth/login");
     });
+    const [tasks, setTasks] = useState<any>([]);
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const tasksCollection = collection(firestoreDB, 'tasks');
 
-    const [task, setTask] = useState<any>([]);
+    const fetchTasks = async () => {
+        if (user) {
+            const q = query(tasksCollection, where("userId", "==", user.uid));
+            const data = await getDocs(q);
+            setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+        } else {
+            console.log("No user logged in");
+        }
+    }
+
+    useEffect(() => {
+        fetchTasks();
+    }, [user]);
 
     return (
         <ScrollView alwaysBounceVertical={true} style={styles.container}>
@@ -24,102 +42,26 @@ const Home = () => {
                 </Link>
             </View>
             <Text style={styles.title}>All Tasks</Text>
-            <Link href="/tasks/1">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
+            <FlatList
+                data={tasks}
+                renderItem={({ item }) => (
+                    <View style={styles.card}>
+                        <View style={styles.card_info}>
+                            <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
+                            </svg>
+                            <Text style={styles.due_date}>Due date: {item.date}</Text>
+                        </View>
+                        <View style={styles.card_info}>
+                            <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
+                            </svg>
+                            <Text>{item.title}</Text>
+                        </View>
                     </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
-            <Link href="/tasks/2">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
-                    </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
-            <Link href="/tasks/3">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
-                    </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
-            <Link href="/tasks/4">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
-                    </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
-            <Link href="/tasks/5">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
-                    </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
-            <Link href="/tasks/6">
-                <View style={styles.card}>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 1V3H15V1H17V3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H7V1H9ZM20 11H4V19H20V11ZM7 5H4V9H20V5H17V7H15V5H9V7H7V5Z"></path>
-                        </svg>
-                        <Text style={styles.due_date}>Due date: 03/01/2025</Text>
-                    </View>
-                    <View style={styles.card_info}>
-                        <svg style={styles.icon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 22H4C3.44772 22 3 21.5523 3 21V3C3 2.44772 3.44772 2 4 2H20C20.5523 2 21 2.44772 21 3V21C21 21.5523 20.5523 22 20 22ZM19 20V4H5V20H19ZM7 6H11V10H7V6ZM7 12H17V14H7V12ZM7 16H17V18H7V16ZM13 7H17V9H13V7Z"></path>
-                        </svg>
-                        <Text>Read react native documentation</Text>
-                    </View>
-                </View>
-            </Link>
+                )}
+                keyExtractor={(item) => item.id.toString()}
+            />
         </ScrollView>
     )
 }

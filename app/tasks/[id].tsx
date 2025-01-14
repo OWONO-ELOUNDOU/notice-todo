@@ -1,9 +1,14 @@
 import React from 'react';
-import {View, StyleSheet, Text, Image} from "react-native";
+import {View, StyleSheet, Text, Image, TouchableOpacity} from "react-native";
 import { Link, Stack, useGlobalSearchParams } from 'expo-router';
 
 // Font Awesome icons
 import { FontAwesome } from '@expo/vector-icons';
+
+// Firebase functions
+import { getAuth } from 'firebase/auth';
+import { firestoreDB } from '@/config/firebaseConfig';
+import { collection, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 // Import Constants
 import {tasks} from "@/assets/tasks";
@@ -12,6 +17,20 @@ import { images } from "@/assets/images";
 const Details = () => {
     const { id } = useGlobalSearchParams();
     const task = tasks[Number(id) - 1];
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const tasksCollection = collection(firestoreDB, 'tasks');
+    // const today =  new Date().toISOString().split('T')[0];
+
+    const updateTask = async (id: string, completed: any) => {
+        const taskDoc = doc(firestoreDB, 'tasks', id);
+        await updateDoc(taskDoc, { completed: !completed })
+    };
+
+    const deleteTask = async (id: string) => {
+        const taskDoc = doc(firestoreDB, 'tasks', id);
+        await deleteDoc(taskDoc);
+    }
 
     return (
         <View style={styles.container}>
@@ -33,14 +52,18 @@ const Details = () => {
                 </Text>
 
                 <View style={styles.buttons}>
-                    <Link style={styles.delete} href="/home">
-                        <FontAwesome size={20} name='trash'/>
-                        Delete
-                    </Link>
-                    <Link style={styles.done} href="/home">
-                        <FontAwesome size={20} name='check'/>
-                        Done
-                    </Link>
+                    <TouchableOpacity>
+                        <Text style={styles.delete}>
+                            <FontAwesome size={20} name='trash'/>
+                            Delete
+                        </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity>
+                        <Text style={styles.done}>
+                            <FontAwesome size={20} name='check'/>
+                            Completed
+                        </Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -130,7 +153,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#ff0000',
-        backgroundColor: '#ffdbdb',
     },
     done: {
         width: '48%',
@@ -145,7 +167,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         color: '#03a603',
-        backgroundColor: '#dbfddb',
     },
     prev_btn: {
         width: '48%',

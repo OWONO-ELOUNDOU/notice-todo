@@ -1,9 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { auth } from '@/config/firebaseConfig';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 
+// Firebase functions
+import { getAuth } from 'firebase/auth';
+import { firestoreDB } from '@/config/firebaseConfig';
+import { collection, getDoc, doc, query, where } from 'firebase/firestore';
+
 const Profile = () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    const [profile, setProfile] = useState<any>({});
+
+    const fetchUser = async () => {
+        if (user) {
+            const userRef = doc(firestoreDB, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            setProfile(userSnap.data());
+        }
+    }
+
     return(
         <View style={styles.container}>
             <View style={styles.picture}>
@@ -11,15 +28,15 @@ const Profile = () => {
             </View>
             <View style={styles.field}>
                 <Text style={styles.label}>First Name</Text>
-                <Text style={styles.text}>John Doe</Text>
+                <Text style={styles.text}>{profile.firstName ? profile.firstName : 'John Doe'}</Text>
             </View>
             <View style={styles.field}>
                 <Text style={styles.label}>Last Name</Text>
-                <Text style={styles.text}>Richard Nelson</Text>
+                <Text style={styles.text}>{profile.lastName ? profile.lastName : 'Richard Nelson'}</Text>
             </View>
             <View style={styles.field}>
                 <Text style={styles.label}>Email Address</Text>
-                <Text style={styles.text}>JohnDoe@outlook.com</Text>
+                <Text style={styles.text}>{user?.email}</Text>
             </View>
 
             {/* Sign Out */}
